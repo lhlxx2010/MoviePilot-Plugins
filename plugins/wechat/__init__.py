@@ -21,7 +21,7 @@ class WeChat(_PluginBase):
     author_url = "https://github.com/lhlxx2010"
     # 插件配置项ID前缀
     plugin_config_prefix = "wechat_"
-    # 加载顺序
+    # 加载顺序和
     plugin_order = 36
     # 可使用的用户级别
     auth_level = 1
@@ -108,7 +108,7 @@ class WeChat(_PluginBase):
                                         'component': 'VTextField',
                                         'props': {
                                             'model': 'wechat_url',
-                                            'label': 'wechat_hook_Url:http:ip:端口'
+                                            'label': 'wechat_hook_Url:http://[ip]:[端口]'
                                         }
                                     }
                                 ]
