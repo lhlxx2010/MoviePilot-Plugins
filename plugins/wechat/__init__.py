@@ -6,7 +6,7 @@ from typing import Any, List, Dict, Tuple
 from app.log import logger
 import time
 
-class WeChat_hook(_PluginBase):
+class WeChat(_PluginBase):
     # 插件名称
     plugin_name = "微信消息推送"
     # 插件描述
