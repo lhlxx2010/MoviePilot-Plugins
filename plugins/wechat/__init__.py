@@ -15,7 +15,7 @@ class WeChat(_PluginBase):
     # 插件图标
     plugin_icon = "Wechat_A.png"
     # 插件版本
-    plugin_version = "1.02"
+    plugin_version = "1.03"
     # 插件作者
     plugin_author = "叉叉"
     # 作者主页
@@ -210,7 +210,10 @@ class WeChat(_PluginBase):
             logger.info("标题和内容不能同时为空")
             return
         logger.info(f"text和title不为空通过")
-        if (msg_type and self._msgtypes):
+        logger.info(f'self._msgtypes = {self._msgtypes}')
+        logger.info(f'msg_type.name = {msg_type.name}')
+        if (msg_type and self._msgtypes
+                and msg_type.name not in self._msgtypes):
             logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
             return
         logger.info(f"消息类型检查通过")
