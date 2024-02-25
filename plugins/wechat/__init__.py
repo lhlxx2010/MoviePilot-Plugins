@@ -165,11 +165,11 @@ class WeChat(_PluginBase):
         """
         消息发送事件
         """
-        if not self._enabled or not self._wechat_url or not self._chatroomid:
-            logger.info(f"没有enable:{self._enabled}")
-            logger.info(f"没有_wechat_url:{_wechat_url}")
-            logger.info(f"没有_chatroomid:{self._chatroomid}")
-            return
+        # if not self._wechat_url or not self._chatroomid:
+        #     logger.info(f"没有enable:{self._enabled}")
+        #     logger.info(f"没有_wechat_url:{_wechat_url}")
+        #     logger.info(f"没有_chatroomid:{self._chatroomid}")
+        #     return
 
         if not event.event_data:
             logger.info(f"没有event.event_data:{event.event_data}")
