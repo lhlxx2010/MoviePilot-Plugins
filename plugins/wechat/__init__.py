@@ -150,7 +150,8 @@ class WeChat(_PluginBase):
         ], {
             "enabled": False,
             "chatroomid": "",
-            "wechat_url": ""
+            "wechat_url": "",
+            'msgtypes': []
         }
 
     def get_page(self) -> List[dict]:
