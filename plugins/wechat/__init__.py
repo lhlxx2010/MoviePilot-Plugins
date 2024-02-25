@@ -32,6 +32,7 @@ class WeChat(_PluginBase):
     _chatroomid = None
     # _method = None
     _enabled = False
+    _msgtypes = []
 
     def init_plugin(self, config: dict = None):
         if config:
@@ -39,6 +40,7 @@ class WeChat(_PluginBase):
             self._wechat_url = config.get("wechat_url")
             self._chatroomid = config.get('chatroomid')
             self.timestamp = int(time.time())
+            self._msgtypes = config.get("msgtypes") or []
             logger.info(f"config_url{self._wechat_url} 获取完成")
 
     def get_state(self) -> bool:
