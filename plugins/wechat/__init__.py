@@ -39,6 +39,7 @@ class WeChat(_PluginBase):
             self._wechat_url = config.get("wechat_url")
             self._chatroomid = config.get('chatroomid')
             self.timestamp = int(time.time())
+            logger.info(f"config_url{self._wechat_url} 获取完成")
 
     def get_state(self) -> bool:
         return self._enabled
@@ -60,6 +61,7 @@ class WeChat(_PluginBase):
                 "title": item.value,
                 "value": item.name
             })
+        # logger.info(f"config_url{self._wechat_url} 获取完成")
         return [
             {
                 'component': 'VForm',
@@ -164,15 +166,20 @@ class WeChat(_PluginBase):
         消息发送事件
         """
         if not self._enabled or not self._wechat_url or not self._chatroomid:
+            logger.info(f"没有enable:{self._enabled}")
+            logger.info(f"没有_wechat_url:{_wechat_url}")
+            logger.info(f"没有_chatroomid:{self._chatroomid}")
             return
 
         if not event.event_data:
+            logger.info(f"没有event.event_data:{event.event_data}")
             return
 
         msg_body = event.event_data
         # 渠道
         channel = msg_body.get("channel")
         if channel:
+            logger.info(f"channel空:{channel}")
             return
         # 类型
         msg_type: NotificationType = msg_body.get("type")
@@ -184,7 +191,7 @@ class WeChat(_PluginBase):
         image = msg_body.get("image")
 
         if not title and not text:
-            logger.warn("标题和内容不能同时为空")
+            logger.info("标题和内容不能同时为空")
             return
 
         if (msg_type and self._msgtypes
@@ -193,6 +200,7 @@ class WeChat(_PluginBase):
             return
 
         try:
+            logger.info(f"开始发消息")
             if not image:
                 payload = {
                     "para": {
@@ -220,7 +228,7 @@ class WeChat(_PluginBase):
             #             ]
             #         }
             #     }
-
+            logger.info(f"消息是:{payload}")
             res = RequestUtils().post_res(url=self._wechat_url, json=payload)
             if res and res.status_code == 200:
                 ret_json = res.json()
