@@ -15,7 +15,7 @@ class WeChat(_PluginBase):
     # 插件图标
     plugin_icon = "Wechat_A.png"
     # 插件版本
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     # 插件作者
     plugin_author = "叉叉"
     # 作者主页
@@ -166,11 +166,14 @@ class WeChat(_PluginBase):
         消息发送事件
         """
         logger.info(f"启动send")
-        if not self._wechat_url or not self._chatroomid:
-            logger.info(f"没有enable:{self._enabled}")
-            logger.info(f"没有_wechat_url:{_wechat_url}")
-            logger.info(f"没有_chatroomid:{self._chatroomid}")
-            return
+        try:
+            if not self._wechat_url or not self._chatroomid:
+                logger.info(f"没有enable:{self._enabled}")
+                logger.info(f"没有_wechat_url:{self._wechat_url}")
+                logger.info(f"没有_chatroomid:{self._chatroomid}")
+                return
+        except Exception as e:
+            logger.error(f"发送事件中出现异常：{e}")
 
         if not event.event_data:
             logger.info(f"没有event.event_data:{event.event_data}")
