@@ -1,5 +1,5 @@
 {
-    "WeChat_hook": {
+    "WeChat": {
         "name": "微信消息通知",
         "description": "微信通知",
         "version": "1.0",

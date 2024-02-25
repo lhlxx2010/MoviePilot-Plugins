@@ -1,4 +1,5 @@
 from app.plugins import _PluginBase
+# from typing import Any, List, Dict, Tuple
 from app.core.event import eventmanager, Event
 from app.schemas.types import EventType, NotificationType
 from app.utils.http import RequestUtils
@@ -10,7 +11,7 @@ class WeChat(_PluginBase):
     # 插件名称
     plugin_name = "微信消息推送"
     # 插件描述
-    plugin_desc = "仅限Hook方式"
+    plugin_desc = "微信通知"
     # 插件图标
     plugin_icon = "Wechat_A.png"
     # 插件版本
@@ -38,6 +39,7 @@ class WeChat(_PluginBase):
             self._wechat_url = config.get("wechat_url")
             self._chatroomid = config.get('chatroomid')
             self.timestamp = int(time.time())
+
     def get_state(self) -> bool:
         return self._enabled
 
@@ -52,7 +54,12 @@ class WeChat(_PluginBase):
         """
         拼装插件配置页面，需要返回两块数据：1、页面配置；2、数据结构
         """
-        # request_options = ["POST", "GET"]
+        MsgTypeOptions = []
+        for item in NotificationType:
+            MsgTypeOptions.append({
+                "title": item.value,
+                "value": item.name
+            })
         return [
             {
                 'component': 'VForm',
@@ -115,6 +122,29 @@ class WeChat(_PluginBase):
                             }
                         ]
                     },
+                    {
+                        'component': 'VRow',
+                        'content': [
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VSelect',
+                                        'props': {
+                                            'multiple': True,
+                                            'chips': True,
+                                            'model': 'msgtypes',
+                                            'label': '消息类型',
+                                            'items': MsgTypeOptions
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
                 ]
             }
         ], {
@@ -127,89 +157,87 @@ class WeChat(_PluginBase):
         pass
 
 
-@eventmanager.register(EventType.NoticeMessage)
-def send(self, event: Event):
-    """
-    消息发送事件
-    """
-    if not self._enabled or not self._wechat_url or not self._chatroomid:
-        return
+    @eventmanager.register(EventType.NoticeMessage)
+    def send(self, event: Event):
+        """
+        消息发送事件
+        """
+        if not self._enabled or not self._wechat_url or not self._chatroomid:
+            return
 
-    if not event.event_data:
-        return
+        if not event.event_data:
+            return
 
-    msg_body = event.event_data
-    # 渠道
-    channel = msg_body.get("channel")
-    if channel:
-        return
-    # 类型
-    msg_type: NotificationType = msg_body.get("type")
-    # 标题
-    title = msg_body.get("title")
-    # 文本
-    text = msg_body.get("text")
-    # 图像
-    image = msg_body.get("image")
+        msg_body = event.event_data
+        # 渠道
+        channel = msg_body.get("channel")
+        if channel:
+            return
+        # 类型
+        msg_type: NotificationType = msg_body.get("type")
+        # 标题
+        title = msg_body.get("title")
+        # 文本
+        text = msg_body.get("text")
+        # 图像
+        image = msg_body.get("image")
 
-    if not title and not text:
-        logger.warn("标题和内容不能同时为空")
-        return
+        if not title and not text:
+            logger.warn("标题和内容不能同时为空")
+            return
 
-    if (msg_type and self._msgtypes
-            and msg_type.name not in self._msgtypes):
-        logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
-        return
+        if (msg_type and self._msgtypes
+                and msg_type.name not in self._msgtypes):
+            logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
+            return
 
-
-
-    try:
-        if not image:
-            payload = {
-                "para": {
-                    "id": str(self.timestamp),
-                    "type": 555,
-                    "roomid": "",
-                    "wxid": self._chatroomid,
-                    "content": title + "\n" + text,
-                    "nickname": "",
-                    "ext": "",
+        try:
+            if not image:
+                payload = {
+                    "para": {
+                        "id": str(self.timestamp),
+                        "type": 555,
+                        "roomid": "",
+                        "wxid": self._chatroomid,
+                        "content": title + "\n" + text,
+                        "nickname": "",
+                        "ext": "",
+                    }
                 }
-            }
-        # 图片涉及到存储到本地，第二个版本开发
-        # else:
-        #     payload = {
-        #         "msgtype": "news",
-        #         "news": {
-        #             "articles": [
-        #                 {
-        #                     "title": title,
-        #                     "description": text,
-        #                     "url": "moviepilot",
-        #                     "picurl": image
-        #                 }
-        #             ]
-        #         }
-        #     }
+            # 图片涉及到存储到本地，第二个版本开发
+            # else:
+            #     payload = {
+            #         "msgtype": "news",
+            #         "news": {
+            #             "articles": [
+            #                 {
+            #                     "title": title,
+            #                     "description": text,
+            #                     "url": "moviepilot",
+            #                     "picurl": image
+            #                 }
+            #             ]
+            #         }
+            #     }
 
-        res = RequestUtils().post_res(url=self._wechat_url, json=payload)
-        if res and res.status_code == 200:
-            ret_json = res.json()
-            errno = ret_json.get('errcode')
-            error = ret_json.get('errmsg')
-            if errno == 0:
-                logger.info("微信机器人消息发送成功")
+            res = RequestUtils().post_res(url=self._wechat_url, json=payload)
+            if res and res.status_code == 200:
+                ret_json = res.json()
+                errno = ret_json.get('errcode')
+                error = ret_json.get('errmsg')
+                if errno == 0:
+                    logger.info("微信机器人消息发送成功")
+                else:
+                    logger.warn(f"微信机器人消息发送失败，错误码：{errno}，错误原因：{error}")
+            elif res is not None:
+                logger.warn(f"微信机器人消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}")
             else:
-                logger.warn(f"微信机器人消息发送失败，错误码：{errno}，错误原因：{error}")
-        elif res is not None:
-            logger.warn(f"微信机器人消息发送失败，错误码：{res.status_code}，错误原因：{res.reason}")
-        else:
-            logger.warn("微信机器人消息发送失败，未获取到返回信息")
-    except Exception as msg_e:
-        logger.error(f"微信机器人消息发送失败，{str(msg_e)}")
+                logger.warn("微信机器人消息发送失败，未获取到返回信息")
+        except Exception as msg_e:
+            logger.error(f"微信机器人消息发送失败，{str(msg_e)}")
 
-def stop_service(self):
-    """
-    退出插件
-    """
-    pass
+    def stop_service(self):
+        """
+        退出插件
+        """
+        pass
