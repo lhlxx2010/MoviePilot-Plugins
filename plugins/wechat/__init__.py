@@ -15,7 +15,7 @@ class WeChat(_PluginBase):
     # 插件图标
     plugin_icon = "Wechat_A.png"
     # 插件版本
-    plugin_version = "1.04"
+    plugin_version = "1.05"
     # 插件作者
     plugin_author = "叉叉"
     # 作者主页
@@ -220,18 +220,18 @@ class WeChat(_PluginBase):
         logger.info(f"开始try消息")
         try:
             logger.info(f"开始发消息")
-            if not image:
-                payload = {
-                    "para": {
-                        "id": str(self.timestamp),
-                        "type": 555,
-                        "roomid": "",
-                        "wxid": self._chatroomid,
-                        "content": title + "\n" + text,
-                        "nickname": "",
-                        "ext": "",
-                    }
+            # if not image:
+            payload = {
+                "para": {
+                    "id": str(self.timestamp),
+                    "type": 555,
+                    "roomid": "",
+                    "wxid": self._chatroomid,
+                    "content": title + "\n" + text,
+                    "nickname": "",
+                    "ext": "",
                 }
+            }
             # 图片涉及到存储到本地，第二个版本开发
             # else:
             #     payload = {
