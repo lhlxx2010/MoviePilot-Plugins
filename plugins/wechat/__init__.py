@@ -175,34 +175,45 @@ class WeChat(_PluginBase):
         except Exception as e:
             logger.error(f"发送事件中出现异常：{e}")
 
+        logger.info(f"检查event")
         if not event.event_data:
             logger.info(f"没有event.event_data:{event.event_data}")
             return
 
+
         msg_body = event.event_data
+        logger.info(f"msg_body:{msg_body}")
         # 渠道
         channel = msg_body.get("channel")
+        logger.info(f"channel:{channel}")
         if channel:
             logger.info(f"channel空:{channel}")
             return
         # 类型
+        logger.info(f"检查msg_type")
         msg_type: NotificationType = msg_body.get("type")
+        logger.info(f"msg_type:{msg_type}")
         # 标题
+        logger.info(f"检查title")
         title = msg_body.get("title")
+        logger.info(f"title:{title}")
         # 文本
+        logger.info(f"检查text")
         text = msg_body.get("text")
+        logger.info(f"text:{text}")
         # 图像
-        image = msg_body.get("image")
+        # image = msg_body.get("image")
 
         if not title and not text:
             logger.info("标题和内容不能同时为空")
             return
-
+        logger.info(f"text和title不为空通过")
         if (msg_type and self._msgtypes
                 and msg_type.name not in self._msgtypes):
             logger.info(f"消息类型 {msg_type.value} 未开启消息发送")
             return
-
+        logger.info(f"消息类型检查通过")
+        logger.info(f"开始try消息")
         try:
             logger.info(f"开始发消息")
             if not image:
